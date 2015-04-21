@@ -5,6 +5,15 @@
 * AUTHOR: Blaise Barney  01/09/04
 * LAST REVISED: 06/28/05
 ******************************************************************************/
+
+/******************************************************************************
+* Bug: Depending the platform, the program can terminate or hang. The bug is 
+       the omp barrier in print_results, it's outside the scope of the omp section
+       directive 
+
+* Fix: remove it
+******************************************************************************/
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -83,7 +92,7 @@ void print_results(float array[N], int tid, int section)
     printf("\n");
   } /*** end of critical ***/
 
-  #pragma omp barrier
+ // #pragma omp barrier
   printf("Thread %d done and synchronized.\n", tid); 
 
 }
