@@ -2,19 +2,18 @@
  *
  *	Jacobi iteration to solve -u'' = 1
  *
- *
+ *      parallelize using OpenMP
  *
  *	Yuan-Xun Bao
- *	Feb 12, 2015
+ *	April 20, 2015
  *
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <time.h>
-
-
+#include <omp.h>
+#include "util.h"
 
 
 int main (int argc, char *argv[]){
@@ -22,10 +21,12 @@ int main (int argc, char *argv[]){
 	int N, j, Niter; 
 	double  h, h2, f, r, r0, tol, rt;
 	double *u, *unew;
-	tol   = 1e-6;
+	tol   = 1e-4;
 	Niter = 0;
-	clock_t t;
-	
+	timestamp_type start_t, stop_t;	
+
+        int nthreads, tid; 
+
 	if (argc != 2){
 		fprintf(stderr, "must input discretization size N\n");
 		exit(0);
@@ -53,23 +54,26 @@ int main (int argc, char *argv[]){
 	}
 	r0 = sqrt(r0/N);
 	
-	t = clock();	
-	
+	get_timestamp(&start_t);
+
 	r = r0;
 	while (r/r0 > tol){
 
+        
+                #pragma omp parallel for private(j)
 		/* Jacobi iteration */
 		for(j= 1; j <=N ; j++){
 			unew[j] = (h2*f + u[j-1] + u[j+1] ) * 0.5;
 		}
 	
+		#pragma omp parallel for private(j)
 		/* copy work */
 		for(j= 1; j <=N ; j++){
 			u[j] = unew[j];
 		}
 	
-		/* compute l2 residue */
-		r = 0.0; 
+ 		r = 0.0;
+		#pragma omp parallel for reduction(+:r) 
 		for(j=1; j <= N ; j++){
 			rt = (-u[j-1] + 2.*u[j] - u[j+1]) / h2 - f;
 			r += rt*rt; 	
@@ -79,11 +83,12 @@ int main (int argc, char *argv[]){
 
 //		printf("the residual at %dth iterion is %.14f\n",Niter, r);
 	}
-	
-	t = clock() - t;	
 
+	get_timestamp(&stop_t);
+	double elapsed = timestamp_diff_in_seconds(start_t, stop_t);
+	
 	printf("Total number of iterations is %d\n", Niter);
-	printf("Time elapsed is %f seconds.\n", ((float)t/CLOCKS_PER_SEC));
+	printf("Time elapsed is %f seconds.\n", elapsed);
 	
 	free(u); free(unew);	
 	
