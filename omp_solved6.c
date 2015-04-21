@@ -6,17 +6,26 @@
 * AUTHOR: Blaise Barney  6/05
 * LAST REVISED: 06/30/05
 ******************************************************************************/
+
+/******************************************************************************
+* Bug: failed compilation, reduction variable 'sum' is private, within dotprod
+*      variable scoping error
+* Fix: change the scope of sum to be global
+*****************************************************************************/
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #define VECLEN 100
 
 float a[VECLEN], b[VECLEN];
+// change scope of sum
+float sum;
 
 float dotprod ()
 {
 int i,tid;
-float sum;
+//float sum;
 
 tid = omp_get_thread_num();
 #pragma omp for reduction(+:sum)
@@ -30,7 +39,7 @@ tid = omp_get_thread_num();
 
 int main (int argc, char *argv[]) {
 int i;
-float sum;
+//float sum;
 
 for (i=0; i < VECLEN; i++)
   a[i] = b[i] = 1.0 * i;

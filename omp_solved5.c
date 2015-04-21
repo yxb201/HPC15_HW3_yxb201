@@ -6,6 +6,16 @@
 * AUTHOR: Blaise Barney  01/29/04
 * LAST REVISED: 04/06/05
 ******************************************************************************/
+
+/******************************************************************************
+* Bug: One thread acquired locka, did some work and now wants to acquire lockb without
+       releasing locka. In the meantime, the other thread already acquired lockb 
+       and now wants to get locka without releasing lockb. Now both locks are set, 
+       causing a deadlock. 
+*
+* Fix: unset a lock immediately after work is done.  
+******************************************************************************/
+
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,12 +55,12 @@ omp_init_lock(&lockb);
       omp_set_lock(&locka);
       for (i=0; i<N; i++)
         a[i] = i * DELTA;
+      omp_unset_lock(&locka);
       omp_set_lock(&lockb);
       printf("Thread %d adding a[] to b[]\n",tid);
       for (i=0; i<N; i++)
         b[i] += a[i];
       omp_unset_lock(&lockb);
-      omp_unset_lock(&locka);
       }
 
     #pragma omp section
@@ -59,12 +69,12 @@ omp_init_lock(&lockb);
       omp_set_lock(&lockb);
       for (i=0; i<N; i++)
         b[i] = i * PI;
+      omp_unset_lock(&lockb);
       omp_set_lock(&locka);
       printf("Thread %d adding b[] to a[]\n",tid);
       for (i=0; i<N; i++)
         a[i] += b[i];
       omp_unset_lock(&locka);
-      omp_unset_lock(&lockb);
       }
     }  /* end of sections */
   }  /* end of parallel region */
