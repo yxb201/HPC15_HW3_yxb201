@@ -5,6 +5,15 @@
 * AUTHOR: Blaise Barney  01/09/04
 * LAST REVISED: 04/06/05
 ******************************************************************************/
+
+/******************************************************************************
+* Bug: an 1048x1048 array exceed the OMP_STACKSIZE for each thread
+*
+* Fix: increase OMP_STACKSIZE
+       in bash: ulimit -s unlimited
+                OMP_STACKSIZE="50M"
+                export OMP_STACKSIZE
+******************************************************************************/
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>

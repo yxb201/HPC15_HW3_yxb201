@@ -12,5 +12,11 @@ omp_solved3: omp_solved3.c
 omp_solved4: omp_solved4.c
 	$(CC) $(CFLAG) omp_solved4.c -o omp_solved4
 
+omp_solved5: omp_solved5.c
+	$(CC) $(CFLAG) omp_solved5.c -o omp_solved5
+
+omp_solved6: omp_solved6.c
+	$(CC) $(CFLAG) omp_solved6.c -o omp_solved6
+
 clean:
-	rm omp_solved2 omp_solved3 omp_solved4
+	rm omp_solved2 omp_solved3 omp_solved4 omp_solved5 omp_solved6
