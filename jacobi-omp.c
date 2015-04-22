@@ -15,24 +15,21 @@
 #include <omp.h>
 #include "util.h"
 
+
 int main (int argc, char *argv[]){
 	
-	int N, i, j, Niter; 
+	int N, i, j; 
 	double  h, h2, f, r, r0, tol, rt;
 	double *u, *unew;
-	tol   = 1e-4;
-        int MAX_ITER = 10000;
-	Niter = 0;
-	timestamp_type start_t, stop_t;	
+	int MAX_ITER;
 
-        int nthreads, tid; 
-
-	if (argc != 2){
-		fprintf(stderr, "must input discretization size N\n");
+	if (argc != 3){
+		fprintf(stderr, "must input discretization size N and # of iterations\n");
 		exit(0);
 	}
 	
-	N = atoi( argv[1] ) ;
+	N = atoi( argv[1] );
+	MAX_ITER = atoi( argv[2] );
 	h = 1./(N+1); h2 = h*h;
 	f = 1.;
 
@@ -61,9 +58,7 @@ int main (int argc, char *argv[]){
 			omp_get_num_threads());
 	}
 
-
-
-
+	timestamp_type start_t, stop_t;	
 	get_timestamp(&start_t);
 
 //	r = r0;
@@ -71,7 +66,9 @@ int main (int argc, char *argv[]){
 	
 	for(i = 0; i < MAX_ITER; i++ ){
 		       
-#pragma omp parallel for default(none) shared(u,unew,h2,f,N)
+#pragma omp parallel for default(none) \
+			 schedule(static) \
+			 shared(u,unew,h2,f,N)
 		//jacobi iteration
 		for(j= 1; j <=N ; j++){
 			unew[j] = (h2*f + u[j-1] + u[j+1] ) * 0.5;
@@ -79,31 +76,32 @@ int main (int argc, char *argv[]){
 	//	printf("Thread %d done\n", omp_get_thread_num());		
 
 		
-#pragma omp parallel for default(none) shared(u,unew,h2,f,N)
+#pragma omp parallel for default(none) \
+			 schedule(static) \
+			 shared(u,unew,h2,f,N)
 		// copy work 
 		for(j= 1; j <=N ; j++){
 			u[j] = unew[j];
 		}
-	       
-		/*  
+/*
  		r = 0.0;
-		#pragma omp parallel for reduction(+:r) 
+		// compute residual
 		for(j=1; j <= N ; j++){
 			rt = (-u[j-1] + 2.*u[j] - u[j+1]) / h2 - f;
-			r += rt*rt; 	
+			r = r + rt*rt; 	
 		}
-		r = sqrt(r/N);
-		Niter++;
-		
-		printf("the residual at %dth iterion is %.14f\n",Niter, r);
-		*/
+
+		r = sqrt(r/N);		
+*/		
+//		printf("the residual at %dth iteration is %.14f\n", i+1, r);
 	}
 
 	get_timestamp(&stop_t);
 	double elapsed = timestamp_diff_in_seconds(start_t, stop_t);
 	
-	printf("Total number of iterations is %d\n", Niter);
+	printf("Total number of iterations is %d\n", MAX_ITER);
 	printf("Time elapsed is %f seconds.\n", elapsed);
+//	printf("the residual at %dth iteration is %.14f\n", MAX_ITER, r);
 	
 	free(u); free(unew);	
 	
