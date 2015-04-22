@@ -69,25 +69,21 @@ int main (int argc, char *argv[]){
 //	r = r0;
 //	while (r/r0 > tol){
 	
-	for(i = 0; i < 1; i++ ){
-		        
-                #pragma omp parallel shared(u,unew,h2,f,N)
-		{ 
-		#pragma omp for 
-		/* Jacobi iteration */
+	for(i = 0; i < MAX_ITER; i++ ){
+		       
+#pragma omp parallel for default(none) shared(u,unew,h2,f,N)
+		//jacobi iteration
 		for(j= 1; j <=N ; j++){
 			unew[j] = (h2*f + u[j-1] + u[j+1] ) * 0.5;
 		}
-		printf("Thread %d done\n", omp_get_thread_num());		
-		}
+	//	printf("Thread %d done\n", omp_get_thread_num());		
 
-		/*
-		#pragma omp parallel for shared(u,unew,h2,f,N)
+		
+#pragma omp parallel for default(none) shared(u,unew,h2,f,N)
 		// copy work 
 		for(j= 1; j <=N ; j++){
 			u[j] = unew[j];
 		}
-		*/
 	       
 		/*  
  		r = 0.0;
