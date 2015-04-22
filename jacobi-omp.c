@@ -73,20 +73,23 @@ int main (int argc, char *argv[]){
 		        
                 #pragma omp parallel shared(u,unew,h2,f,N)
 		{ 
-		#pragma omp for
+		#pragma omp for 
 		/* Jacobi iteration */
 		for(j= 1; j <=N ; j++){
 			unew[j] = (h2*f + u[j-1] + u[j+1] ) * 0.5;
 		}
 		printf("Thread %d done\n", omp_get_thread_num());		
 		}
+
+		/*
 		#pragma omp parallel for shared(u,unew,h2,f,N)
-		/* copy work */
+		// copy work 
 		for(j= 1; j <=N ; j++){
 			u[j] = unew[j];
 		}
-	        
-		/*
+		*/
+	       
+		/*  
  		r = 0.0;
 		#pragma omp parallel for reduction(+:r) 
 		for(j=1; j <= N ; j++){
@@ -95,8 +98,9 @@ int main (int argc, char *argv[]){
 		}
 		r = sqrt(r/N);
 		Niter++;
+		
+		printf("the residual at %dth iterion is %.14f\n",Niter, r);
 		*/
-//		printf("the residual at %dth iterion is %.14f\n",Niter, r);
 	}
 
 	get_timestamp(&stop_t);
