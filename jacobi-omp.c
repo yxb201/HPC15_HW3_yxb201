@@ -54,11 +54,21 @@ int main (int argc, char *argv[]){
 	}
 	r0 = sqrt(r0/N);
 
+	#pragma omp parallel
+	{
+		printf("Hello, I am thread %d of %d\n", 
+			omp_get_thread_num(), 
+			omp_get_num_threads());
+	}
+
+
+
+
 	get_timestamp(&start_t);
 
 //	r = r0;
 //	while (r/r0 > tol){
-	omp_set_num_threads(128);
+	
 	for(i = 0; i < MAX_ITER; i++ ){
         
                 #pragma omp parallel for private(j) shared(u,unew,h2,f,N)
