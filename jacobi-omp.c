@@ -58,20 +58,22 @@ int main (int argc, char *argv[]){
 
 //	r = r0;
 //	while (r/r0 > tol){
+	omp_set_num_threads(128);
 	for(i = 0; i < MAX_ITER; i++ ){
         
-                #pragma omp parallel for private(j)
+                #pragma omp parallel for private(j) shared(u,unew,h2,f,N)
 		/* Jacobi iteration */
 		for(j= 1; j <=N ; j++){
 			unew[j] = (h2*f + u[j-1] + u[j+1] ) * 0.5;
 		}
 	
-		#pragma omp parallel for private(j)
+		#pragma omp parallel for private(j) shared(u,unew,h2,f,N)
 		/* copy work */
 		for(j= 1; j <=N ; j++){
 			u[j] = unew[j];
 		}
 	        
+		/*
  		r = 0.0;
 		#pragma omp parallel for reduction(+:r) 
 		for(j=1; j <= N ; j++){
@@ -80,7 +82,7 @@ int main (int argc, char *argv[]){
 		}
 		r = sqrt(r/N);
 		Niter++;
-
+		*/
 //		printf("the residual at %dth iterion is %.14f\n",Niter, r);
 	}
 
