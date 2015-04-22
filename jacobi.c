@@ -2,31 +2,30 @@
  *
  *	Jacobi iteration to solve -u'' = 1
  *
- *      parallelize using OpenMP
+ *
  *
  *	Yuan-Xun Bao
- *	April 20, 2015
+ *	Feb 12, 2015
  *
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <omp.h>
 #include "util.h"
+
+
 
 int main (int argc, char *argv[]){
 	
 	int N, i, j, Niter; 
 	double  h, h2, f, r, r0, tol, rt;
 	double *u, *unew;
-	tol   = 1e-4;
-        int MAX_ITER = 10000;
+	tol   = 1e-1;
+ 	int MAX_ITER = 10000;
 	Niter = 0;
-	timestamp_type start_t, stop_t;	
-
-        int nthreads, tid; 
-
+	timestamp_type start_t, stop_t;
+	
 	if (argc != 2){
 		fprintf(stderr, "must input discretization size N\n");
 		exit(0);
@@ -46,62 +45,44 @@ int main (int argc, char *argv[]){
 		unew[j] = 0.;
 	}
 
-        /* initial residual */	
+	/* initial residual*/	
 	r0 = 0.0;
 	for(j=1; j<=N; j++){
 		rt  = (-u[j-1] + 2.*u[j] - u[j+1]) / h2 - f;
 		r0 += rt*rt;  
 	}
 	r0 = sqrt(r0/N);
-
-	#pragma omp parallel
-	{
-		printf("Hello, I am thread %d of %d\n", 
-			omp_get_thread_num(), 
-			omp_get_num_threads());
-	}
-
-
-
-
-	get_timestamp(&start_t);
-
+	
+	get_timestamp(&start_t);	
+	
 //	r = r0;
 //	while (r/r0 > tol){
-	
 	for(i = 0; i < MAX_ITER; i++ ){
-		       
-#pragma omp parallel for default(none) shared(u,unew,h2,f,N)
-		//jacobi iteration
+		/* Jacobi iteration */
 		for(j= 1; j <=N ; j++){
 			unew[j] = (h2*f + u[j-1] + u[j+1] ) * 0.5;
 		}
-	//	printf("Thread %d done\n", omp_get_thread_num());		
-
-		
-#pragma omp parallel for default(none) shared(u,unew,h2,f,N)
-		// copy work 
+	
+		/* copy work */
 		for(j= 1; j <=N ; j++){
 			u[j] = unew[j];
 		}
-	       
-		/*  
- 		r = 0.0;
-		#pragma omp parallel for reduction(+:r) 
+/*
+		// compute l2 residue
+		r = 0.0; 
 		for(j=1; j <= N ; j++){
 			rt = (-u[j-1] + 2.*u[j] - u[j+1]) / h2 - f;
 			r += rt*rt; 	
 		}
 		r = sqrt(r/N);
 		Niter++;
-		
-		printf("the residual at %dth iterion is %.14f\n",Niter, r);
-		*/
+*/
+//		printf("the residual at %dth iterion is %.14f\n",Niter, r);
 	}
-
-	get_timestamp(&stop_t);
-	double elapsed = timestamp_diff_in_seconds(start_t, stop_t);
 	
+	get_timestamp(&stop_t);
+	double elapsed = timestamp_diff_in_seconds(start_t,stop_t);
+
 	printf("Total number of iterations is %d\n", Niter);
 	printf("Time elapsed is %f seconds.\n", elapsed);
 	

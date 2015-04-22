@@ -1,7 +1,7 @@
-CC=gcc
+CC=gcc49
 CFLAG = -fopenmp 
 
-all: omp_solved2 omp_solved3 omp_solved4 omp_solved5 omp_solved6 jacobi-omp
+all: omp_solved2 omp_solved3 omp_solved4 omp_solved5 omp_solved6 jacobi-omp jacobi
 
 omp_solved2: omp_solved2.c
 	$(CC) $(CFLAG) omp_solved2.c -o omp_solved2
@@ -19,7 +19,9 @@ omp_solved6: omp_solved6.c
 	$(CC) $(CFLAG) omp_solved6.c -o omp_solved6
 
 jacobi-omp: jacobi-omp.c
-	$(CC) $(CFLAG) jacobi-omp.c -o jacobi-omp -lm -O3
+	$(CC) $(CFLAG) jacobi-omp.c -o jacobi-omp -lm -lrt
 
+jacobi: jacobi.c
+	$(CC) jacobi.c -o jacobi -lm -lrt 
 clean:
-	rm omp_solved2 omp_solved3 omp_solved4 omp_solved5 omp_solved6 jacobi-omp
+	rm omp_solved2 omp_solved3 omp_solved4 omp_solved5 omp_solved6 jacobi-omp jacobi
