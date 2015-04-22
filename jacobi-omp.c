@@ -15,13 +15,13 @@
 #include <omp.h>
 #include "util.h"
 
-
 int main (int argc, char *argv[]){
 	
-	int N, j, Niter; 
+	int N, i, j, Niter; 
 	double  h, h2, f, r, r0, tol, rt;
 	double *u, *unew;
 	tol   = 1e-4;
+        int MAX_ITER = 100;
 	Niter = 0;
 	timestamp_type start_t, stop_t;	
 
@@ -46,19 +46,19 @@ int main (int argc, char *argv[]){
 		unew[j] = 0.;
 	}
 
-	/* initial residual*/	
+        /* initial residual */	
 	r0 = 0.0;
 	for(j=1; j<=N; j++){
 		rt  = (-u[j-1] + 2.*u[j] - u[j+1]) / h2 - f;
 		r0 += rt*rt;  
 	}
 	r0 = sqrt(r0/N);
-	
+
 	get_timestamp(&start_t);
 
-	r = r0;
-	while (r/r0 > tol){
-
+//	r = r0;
+//	while (r/r0 > tol){
+	for(i = 0; i < MAX_ITER; i++ ){
         
                 #pragma omp parallel for private(j)
 		/* Jacobi iteration */
@@ -71,7 +71,7 @@ int main (int argc, char *argv[]){
 		for(j= 1; j <=N ; j++){
 			u[j] = unew[j];
 		}
-	
+	        
  		r = 0.0;
 		#pragma omp parallel for reduction(+:r) 
 		for(j=1; j <= N ; j++){
