@@ -12,3 +12,4 @@ gs-omp
 *.synctex.gz
 *.pdf
 *.dvi
+.DS_Store
