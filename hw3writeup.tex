@@ -1,0 +1,67 @@
+\documentclass[12pt]{article}
+
+%% FONTS
+%% To get the default sans serif font in latex, uncomment following line:
+ \renewcommand*\familydefault{\sfdefault}
+%%
+%% to get Arial font as the sans serif font, uncomment following line:
+%% \renewcommand{\sfdefault}{phv} % phv is the Arial font
+%%
+%% to get Helvetica font as the sans serif font, uncomment following line:
+% \usepackage{helvet}
+\usepackage[small,bf,up]{caption}
+\renewcommand{\captionfont}{\footnotesize}
+\usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
+\usepackage{graphics,epsfig,graphicx,float,subfigure,color}
+\usepackage{amsmath,amssymb,amsbsy,amsfonts,amsthm}
+\usepackage{url}
+\usepackage{boxedminipage}
+\usepackage[sf,bf,tiny]{titlesec}
+ \usepackage[plainpages=false, colorlinks=true,
+   citecolor=blue, filecolor=blue, linkcolor=blue,
+   urlcolor=blue]{hyperref}
+\usepackage{enumitem}
+
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+% see documentation for titlesec package
+% \titleformat{\section}{\large \sffamily \bfseries}
+\titlelabel{\thetitle.\,\,\,}
+
+
+\newcommand{\bs}{\boldsymbol}
+\newcommand{\alert}[1]{\textcolor{red}{#1}}
+\setlength{\emergencystretch}{20pt}
+
+\begin{document}
+
+\begin{center}
+
+\large \textbf{%%
+High Performance Computing \\ Assignment \#3 \\ Yuan-Xun Bao \\ yxb201@nyu.edu \quad N13392943}
+\end{center}
+
+% ****************************
+\section{Parallel Jacobi and Gauss-Seidal iteration using OpenMP}
+
+Array size: $N = 1000000$ and 10000 iterations on 1 Stampede node (two Xeon E5-2680 processors: 2$\times$8 cores)
+\begin{verbatim}
+./jacobi-omp 1000000 10000
+
+./gs-omp 1000000 10000 
+\end{verbatim}
+
+\begin{center}
+  \begin{tabular}{ | c | c | c |}
+    \hline
+    \# of threads & \verb|jacobi-omp| & \verb|gs-omp| \\ \hline
+    1  & 15.953617s  &  10.017236s \\ \hline
+    2  & 7.737019s & 5.068510s \\ \hline
+    4  & 3.897146s & 2.547866s \\ \hline
+    8 & 2.010836s & 1.311542s \\ \hline
+    12 & 1.385623s & 0.911741s \\ \hline
+    16 & 2.757685s & 1.796598s \\ 
+     \hline
+  \end{tabular}
+\end{center}
+
+\end{document}

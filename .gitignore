@@ -6,3 +6,8 @@ omp_solved
 jacobi-omp
 gs-omp
 *swp
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.pdf

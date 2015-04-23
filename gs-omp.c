@@ -44,14 +44,23 @@ int main (int argc, char *argv[]){
 	for(j = 0; j<=N+1; j++){
 		u[j] = 0.;
 	}
-	
-	/* initial residual */
+
+/*	
+	// initial residual
 	r0 = 0.0;
 	for(j=1; j <= N ; j++){
 		rt = (-u[j-1] + 2.*u[j] - u[j+1]) / h2 - f;
 		r0 += rt*rt; 	
 	}
 	r0 = sqrt(r0/N);
+*/
+
+	#pragma omp parallel
+	{
+		printf("Hello, I am thread %d of %d\n", 
+			omp_get_thread_num(),
+			omp_get_num_threads());
+	}
 	
 	timestamp_type start_t, stop_t;
 	get_timestamp(&start_t);
