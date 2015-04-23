@@ -20,8 +20,9 @@
 
 int main (int argc, char *argv[]){
 	
-	int N, j, j; 
+	int N, i, j; 
 	double  h, h2, f, r, r0, rt, tol;
+//	tol = 1e-6;
 	double *u;
 	int MAX_ITER;
 
@@ -63,20 +64,35 @@ int main (int argc, char *argv[]){
 		
 		
 		// gauss-seidal iteration
-		for(j= 1; j <=N ; j++){
-			u[j] = (h2*f + u[j-1] + u[j+1] ) * 0.5;
+
+#pragma omp parallel for private(j)	
+		// 1st sweep
+		for(j= 1; j <= N/2 ; j++){
+			u[j] = (h2*f + u[j+(N/2)] + u[j+1+(N/2)] ) * 0.5;
 		}
-	
+
+#pragma omp parallel for private(j)
+		// 2nd sweep
+		for(j= 1; j<=N/2; j++){
+			u[j+N/2] = (h2*f + u[j-1] + u[j] ) * 0.5;
+		}
+
+/*
 		// compute l2 residue 
 		r = 0.0;
-		for(j=1; j <= N ; j++){
-			rt = (-u[j-1] + 2.*u[j] - u[j+1]) / h2 - f;
+		for(j=1; j <= N/2 ; j++){
+			rt = (2.*u[j] - u[j+(N/2)] - u[j+1+(N/2)]) / h2 - f;
 			r +=  rt*rt; 	
+		}
+		for(j=1; j<= N/2 ; j++){
+			rt = (-u[j-1]-u[j] + 2.*u[j+N/2]) / h2 - f;
+			r += rt*rt;
 		}
 		r = sqrt(r/N);
 		Niter++;
 
-//		printf("the residual at %dth iterion is %.14f\n",Niter, r);
+		printf("the residual at %dth iterion is %.14f\n",Niter, r);
+*/
 	}
 	
 	get_timestamp(&stop_t);

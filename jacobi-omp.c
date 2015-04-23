@@ -33,23 +33,25 @@ int main (int argc, char *argv[]){
 	h = 1./(N+1); h2 = h*h;
 	f = 1.;
 
-	/* Jacobi, two arrays */
+	// allocate u, unew
 	u    = (double *) malloc( (N+2) * sizeof(double));
 	unew = (double *) malloc( (N+2) * sizeof(double));
 
- 	/* initialize */
+ 	// fill arrays
 	for(j = 0; j<=N+1; j++){
 		u[j]    = 0.;
 		unew[j] = 0.;
 	}
 
-        /* initial residual */	
+/*
+        // initial residual	
 	r0 = 0.0;
 	for(j=1; j<=N; j++){
 		rt  = (-u[j-1] + 2.*u[j] - u[j+1]) / h2 - f;
 		r0 += rt*rt;  
 	}
 	r0 = sqrt(r0/N);
+*/
 
 	#pragma omp parallel
 	{
@@ -61,8 +63,10 @@ int main (int argc, char *argv[]){
 	timestamp_type start_t, stop_t;	
 	get_timestamp(&start_t);
 
-//	r = r0;
-//	while (r/r0 > tol){
+/*
+	r = r0;
+	while (r/r0 > tol){
+*/
 	
 	for(i = 0; i < MAX_ITER; i++ ){
 		       
