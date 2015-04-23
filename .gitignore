@@ -11,3 +11,4 @@ gs-omp
 *.out
 *.synctex.gz
 *.pdf
+*.dvi
